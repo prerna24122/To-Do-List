@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>todo list</title>
+    <style>
+        html,
+        body {
+            background-color: rgba(10, 52, 239, 0.5);
+        }
+
+        .middle {
+            background-color: white;
+            margin: auto;
+            position: absolute;
+            width: 600px;
+            height: 460px;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-shadow: 15px 15px 20px;
+        }
+
+        .myinput input {
+            width: 230px;
+            margin-left: 3px;
+            text-align: center;
+        }
+
+        #update {
+            display: none;
+        }
+
+        #done {
+            display: none;
+        }
+
+        #status {
+            display: none;
+        }
+
+        #submitt {
+            background-color: black;
+            color: white;
+            width: 80px;
+            height: 25px;
+        }
+
+        #submitt:hover {
+            background-color: red;
+        }
+
+        #NotDone {
+            background-color: brown;
+            color: white;
+        }
+
+        #Done {
+            background-color: greenyellow;
+            color: white;
+        }
+
+        #update {
+            background-color: black;
+            color: white;
+            width: 80px;
+            height: 25px;
+            margin-top: 10px;
+        }
+
+        #update:hover {
+            background-color: red;
+        }
+        #calender{
+            width: 100px;
+            color: black;
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="middle">
+        <center>
+            <div class="myinput">
+                <h1>TO-Do-list<center>
+                </h1>
+                <input type="text" placeholder="enter your list" id="list">&nbsp;<input id="calender" type="date">&nbsp;<button onclick="add_data()"
+                    id="submitt">Submitt</button>&nbsp;<button id="update">update</button>
+
+            </div>
+            <table>
+                <tr>
+                    <td><label id="done">Done</label></td>
+                    <td><input type="checkbox" value="Done" id="status"></td>
+                </tr>
+            </table>
+            <table id="mytable" border="1">
+
+            </table>
+            <center>
+    </div>
+    <script>
+        function add_data() {
+            var li = document.getElementById("list").value;
+            var t = new Date().toLocaleTimeString();
+            var c=document.getElementById("calender").value;
+            var status = "Not Done";
+           
+            if(li==""){
+                    alert("List can not be empty");
+                    return false;
+                     }
+                else if(c==""){
+                    alert("invalid");
+                    return false;
+                }
+              else{
+
+            if (localStorage.getItem("list") == null) {
+                var listitem = [];
+            }
+            else {
+                var listitem = JSON.parse(localStorage.getItem("list"));
+            }
+            listitem.push(
+                {
+                    List: li,
+                    Mytime: t,
+                    Calender:c,
+                    Status: status,
+                }
+            )
+            localStorage.setItem("list", JSON.stringify(listitem));
+            document.getElementById("list").value="";
+           
+            document.onload(showdata());
+            
+            }
+        }
+
+
+        function showdata() {
+            
+
+            if (localStorage.getItem("list") == null) {
+                var listitem = [];
+            }
+            else {
+                var listitem = JSON.parse(localStorage.getItem("list"));
+            }
+           
+
+            var data = "";
+            data += "<tr>";
+            data += "<th>index</th>";
+            data += "<th> List </th>";
+            data += "<th> Time </th>";
+            data+="<th>Calender</th>";
+            data += "<th> Status </th>";
+            data += "<th> Delete </th>";
+            data += "<th> Edit </th>";
+            data += "</tr>";
+
+            listitem.forEach((element, index) => {
+                data += "<tr>";
+                data += `<td>${index + 1} </td>`;
+                data += "<td>";
+                data += element.List;
+                data += "</td>"
+                data += "<td>";
+                data += element.Mytime;
+                data += "</td>"
+                data+="<td>";
+                data+=element.Calender;
+                data+="</td>"    
+                data += "<td id='" + element.Status.replace(/\s/g, "") + "'>";
+                data += element.Status
+                data += "</td>"
+                data += `<td><button onclick="deletedata(${index})">Delete</button></td>`
+                data += `<td><button onclick="editdata(${index})">edit</button></td>`
+
+                data += "</tr>"
+
+            });
+            document.getElementById("mytable").innerHTML = data;
+        }
+
+
+
+        document.onload(showdata());
+        function deletedata(index) {
+            if (localStorage.getItem("list") == null) {
+                var listitem = [];
+            }
+            else {
+                var listitem = JSON.parse(localStorage.getItem("list"));
+            }
+            listitem.splice(index, 1);
+            localStorage.setItem("list", JSON.stringify(listitem));
+            showdata();
+        }
+        function editdata(index) {
+            document.getElementById("submitt").style.display = "none";
+            document.getElementById("update").style.display = "block";
+            document.getElementById("done").style.display = "block";
+            document.getElementById("status").style.display = "block";
+            if (localStorage.getItem("list") == null) {
+                var listitem = [];
+            }
+            else {
+                var listitem = JSON.parse(localStorage.getItem("list"));
+            }
+            document.getElementById("list").value = listitem[index].List
+            document.querySelector("#update").onclick = function () {
+                var n = document.getElementById("list").value;
+                var s = document.getElementById("status").checked;
+                if (s == true) {
+                    console.log("Done");
+                    var st = "Done";
+                }
+                else {
+                    console.log("Not Done");
+                    var st = "Not Done";
+                }
+                listitem[index].List = n;
+                listitem[index].Status = st;
+                localStorage.setItem("list", JSON.stringify(listitem));
+                showdata();
+
+                document.getElementById("submitt").style.display = "block";
+                document.getElementById("update").style.display = "none";
+                document.getElementById("status").style.display = "none";
+                document.getElementById("done").style.display = "none";
+                //   document.getElementById("add_record").style.display = "block";
+                //  document.getElementById("update_record").style.display = "none";
+                document.getElementById("list").value = "";
+
+
+
+            }
+        }
+    </script>
+</body>
+
+</html>
